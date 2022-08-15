@@ -9,13 +9,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -29,6 +33,9 @@ public class MainController {
     private static final ObservableList<String> PIPES_DIAMETER = FXCollections.observableArrayList("33.40", "42.16", "46.26", "60.32",
             "73.02", "88.90", "101.60", "114.30");
     private static final PipeSize[] PIPE_SIZES = PipeSize.values();
+    private static final DecimalFormat WEIGHT_LENGTH_FORMAT = new DecimalFormat("###,###.00");
+    private static final DecimalFormat COUNT_FORMAT = new DecimalFormat("###,###.##");
+
 
     @FXML // fx:id="calcBtn"
     private Button calcBtn;
@@ -71,6 +78,32 @@ public class MainController {
         pipeCountPrevResultTable.setCellValueFactory(cellData -> cellData.getValue().countPipeProperty());
 
         prevResults.setItems(CALC_PIPE_RESULTS);
+        prevResults.getSelectionModel().setCellSelectionEnabled(true);
+        MenuItem item = new MenuItem("Копировать");
+        item.setOnAction(event -> {
+            ObservableList<TablePosition> posList = prevResults.getSelectionModel().getSelectedCells();
+            int old_r = -1;
+            StringBuilder clipboardString = new StringBuilder();
+            for (TablePosition p : posList) {
+                int r = p.getRow();
+                int c = p.getColumn();
+                Object cell = prevResults.getColumns().get(c).getCellData(r);
+                if (cell == null)
+                    cell = "";
+                if (old_r == r)
+                    clipboardString.append('\t');
+                else if (old_r != -1)
+                    clipboardString.append('\n');
+                clipboardString.append(cell);
+                old_r = r;
+            }
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(clipboardString.toString());
+            Clipboard.getSystemClipboard().setContent(content);
+        });
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().add(item);
+        prevResults.setContextMenu(menu);
 
         MultipleSelectionModel<String> wallThicknessSelection = wallThicknessPipe.getSelectionModel();
         diameterPipe.setItems(PIPES_DIAMETER);
@@ -171,7 +204,10 @@ public class MainController {
             }
         }
         String result = String.format("%s|%s|%s|%s",
-                pipe, weightPipe.getText(), lengthPipe.getText(), countPipe.getText());
+                pipe,
+                WEIGHT_LENGTH_FORMAT.format(new BigDecimal(weightPipe.getText())),
+                WEIGHT_LENGTH_FORMAT.format(new BigDecimal(lengthPipe.getText())),
+                COUNT_FORMAT.format(new BigDecimal(countPipe.getText())));
 
 
         try (FileWriter fileWriter = new FileWriter(FILE_NAME, true);

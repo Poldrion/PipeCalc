@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Main-Class: Launcher
+Class-Path: src.zip jrt-fs.jar controlsfx-11.1.1.jar javafx-graphics-18.
+ 0.2-win.jar javafx-fxml-18.0.2-win.jar javafx-swt.jar javafx.web.jar ja
+ vafx.base.jar javafx.fxml.jar javafx.media.jar javafx.swing.jar javafx.
+ controls.jar javafx.graphics.jar javafx-graphics-18.0.2.jar javafx-base
+ -18.0.2-win.jar javafx-fxml-18.0.2.jar javafx-controls-18.0.2-win.jar j
+ avafx-base-18.0.2.jar javafx-swt.jar javafx.web.jar javafx.base.jar jav
+ afx.fxml.jar javafx.media.jar javafx.swing.jar javafx.controls.jar java
+ fx.graphics.jar javafx-controls-18.0.2.jar
+
